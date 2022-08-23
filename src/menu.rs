@@ -957,24 +957,18 @@ pub struct EguiUi<'a>(&'a mut egui::Ui);
 impl<'a> Ui for EguiUi<'a> {
     fn horizontal(&mut self, f: impl FnOnce(&mut Self)) {
         self.0.horizontal(move |ui| {
-            // FIXME
-            f(&mut EguiUi(unsafe {
-                let p: *mut egui::Ui = ui;
-                &mut *p
-            }))
+            let ui_as_any = ui as &dyn Any;
+            f(&mut EguiUi(ui_as_any.downcast_mut().unwrap()))
         });
     }
 
     fn enabled(&mut self, enabled: bool, f: impl FnOnce(&mut Self)) {
         self.0.add_enabled_ui(enabled, |ui| {
-            // FIXME
-            f(&mut EguiUi(unsafe {
-                let p: *mut egui::Ui = ui;
-                &mut *p
-            }))
+            let ui_as_any = ui as &dyn Any;
+            f(&mut EguiUi(ui_as_any.downcast_mut().unwrap()))
         });
     }
-
+    
     fn label(&mut self, text: &str) {
         self.0.label(text);
     }
